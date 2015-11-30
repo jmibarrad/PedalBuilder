@@ -281,7 +281,8 @@ public class MainActivity extends AppCompatActivity{
         p.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
+                Button btn=(Button)findViewById(R.id.rotateButton);
+                btn.setVisibility(View.VISIBLE);
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         moving = true;
