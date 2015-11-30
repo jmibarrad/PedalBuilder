@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity{
     HashMap<String, List<String>> listDataChild;
     ParseFile Img;
     Button rotateButton;
+    Button deleteButton;
     ImageView selectedImg;
     ImageView Board;
     float angle = 0;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity{
 
         layout = (FrameLayout)findViewById(R.id.fmlayout);
         rotateButton = (Button)findViewById(R.id.rotateButton);
+        deleteButton = (Button)findViewById(R.id.deleteButton);
 
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
         // preparing list data
@@ -71,27 +73,6 @@ public class MainActivity extends AppCompatActivity{
                 // "Group Clicked " + listDataHeader.get(groupPosition),
                 // Toast.LENGTH_SHORT).show();
                 return false;
-            }
-        });
-
-        expListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-
-            @Override
-            public void onGroupExpand(int groupPosition) {
-                Toast.makeText(getApplicationContext(),
-                        listDataHeader.get(groupPosition) + " Expanded",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        expListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-
-            @Override
-            public void onGroupCollapse(int groupPosition) {
-                Toast.makeText(getApplicationContext(),
-                        listDataHeader.get(groupPosition) + " Collapsed",
-                        Toast.LENGTH_SHORT).show();
-
             }
         });
 
@@ -123,36 +104,40 @@ public class MainActivity extends AppCompatActivity{
                                 }
                             }
                         });
-                    break;
+                        break;
                     case 1:
-                        ParseQuery<ParseObject> pedalQuery = ParseQuery.getQuery("Pedals");
-                        pedalQuery.findInBackground(new FindCallback<ParseObject>() {
-                            @Override
-                            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                                if (e == null) {
-                                    Img = objects.get(childPosition).getParseFile("Image");
-                                    final float w = objects.get(childPosition).getInt("Width");
-                                    final float h = objects.get(childPosition).getInt("Height");
-                                    Img.getDataInBackground(new GetDataCallback() {
-                                        @Override
-                                        public void done(byte[] data, com.parse.ParseException e) {
-                                            if (e == null) {
-                                                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                                AddNewPedal(bitmap, w, h);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    break;
-                }
+                        if(Board != null){
 
-                Toast.makeText(getApplicationContext(), listDataHeader.get(groupPosition) + " : " + childPosition + "-" +
-                                                        listDataChild.get(
-                                                                listDataHeader.get(groupPosition)).get(
-                                                                childPosition),
-                               Toast.LENGTH_SHORT).show();
+                            ParseQuery<ParseObject> pedalQuery = ParseQuery.getQuery("Pedals");
+                            pedalQuery.findInBackground(new FindCallback<ParseObject>() {
+                                @Override
+                                public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                                    if (e == null) {
+                                        Img = objects.get(childPosition).getParseFile("Image");
+                                        final float w = objects.get(childPosition).getInt("Width");
+                                        final float h = objects.get(childPosition).getInt("Height");
+                                        Img.getDataInBackground(new GetDataCallback() {
+                                            @Override
+                                            public void done(byte[] data, com.parse.ParseException e) {
+                                                if (e == null) {
+                                                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                                    AddNewPedal(bitmap, w, h);
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }else{
+                            Toast.makeText(getApplicationContext(), "ERROR: Choose Board First" ,
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        break;
+                }
+                if(Board != null)
+                    Toast.makeText(getApplicationContext(), listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition),
+                                   Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -161,10 +146,21 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void onClick(View v) {
-                angle += 90;
-                selectedImg.setRotation(angle);
+                if(selectedImg != null){
+                    angle += 90;
+                    selectedImg.setRotation(angle);
+                }
             }
         });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(selectedImg != null)
+                    selectedImg.setImageBitmap(null);
+            }
+        });
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -281,8 +277,7 @@ public class MainActivity extends AppCompatActivity{
         p.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Button btn=(Button)findViewById(R.id.rotateButton);
-                btn.setVisibility(View.VISIBLE);
+
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         moving = true;
