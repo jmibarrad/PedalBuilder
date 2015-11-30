@@ -42,8 +42,7 @@ public class MainActivity extends AppCompatActivity{
     Button rotateButton;
     Button deleteButton;
     ImageView selectedImg;
-    ImageView Board;
-    float angle = 0;
+    ImageView board;
     boolean moving = true;
     FrameLayout layout;
 
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity{
                         });
                         break;
                     case 1:
-                        if(Board != null){
+                        if(board != null){
 
                             ParseQuery<ParseObject> pedalQuery = ParseQuery.getQuery("Pedals");
                             pedalQuery.findInBackground(new FindCallback<ParseObject>() {
@@ -114,6 +113,9 @@ public class MainActivity extends AppCompatActivity{
                                 public void done(List<ParseObject> objects, com.parse.ParseException e) {
                                     if (e == null) {
                                         Img = objects.get(childPosition).getParseFile("Image");
+                                        final String Name= objects.get(childPosition).getString("Name");
+                                        final String Type= objects.get(childPosition).getString("Type");
+                                        final String Brand= objects.get(childPosition).getString("Brand");
                                         final float w = objects.get(childPosition).getInt("Width");
                                         final float h = objects.get(childPosition).getInt("Height");
                                         Img.getDataInBackground(new GetDataCallback() {
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity{
                                             public void done(byte[] data, com.parse.ParseException e) {
                                                 if (e == null) {
                                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                                    AddNewPedal(bitmap, w, h);
+                                                    AddNewPedal(bitmap,Type,Name,Brand,h,w);
                                                 }
                                             }
                                         });
@@ -135,7 +137,7 @@ public class MainActivity extends AppCompatActivity{
 
                         break;
                 }
-                if(Board != null)
+                if(board != null)
                     Toast.makeText(getApplicationContext(), listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition),
                                    Toast.LENGTH_SHORT).show();
                 return false;
@@ -147,8 +149,8 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 if(selectedImg != null){
-                    angle += 90;
-                    selectedImg.setRotation(angle);
+                    ((Pedal)selectedImg).angle = ((Pedal)selectedImg).angle + 90;
+                    selectedImg.setRotation(((Pedal)selectedImg).angle);
                 }
             }
         });
@@ -156,7 +158,7 @@ public class MainActivity extends AppCompatActivity{
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(selectedImg != null)
+                if (selectedImg != null)
                     selectedImg.setImageBitmap(null);
             }
         });
@@ -193,9 +195,6 @@ public class MainActivity extends AppCompatActivity{
                     for (ParseObject obj : objects) {
                         boardsList.add(obj.getString("Name"));
                     }
-
-                } else {
-                    //objectRetrievalFailed();
                 }
             }
         });
@@ -209,29 +208,11 @@ public class MainActivity extends AppCompatActivity{
                     for (ParseObject obj : objects) {
                         pedalsList.add(obj.getString("Name"));
                     }
-
-                } else {
-                    //objectRetrievalFailed();
                 }
             }
         });
 
         List<String> powerSuppliesList = new ArrayList<String>();
-        /*
-        ParseQuery<ParseObject> powerSuppliesQuery = ParseQuery.getQuery("PowerSupplies");
-        powerSuppliesQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                if (e == null) {
-                    for (ParseObject obj : objects) {
-                        boardsList.add(obj.getString("Name"));
-                    }
-
-                } else {
-                    //objectRetrievalFailed();
-                }
-            }
-        });*/
 
         listDataChild.put(listDataHeader.get(0), boardsList);
         listDataChild.put(listDataHeader.get(1), pedalsList);
@@ -239,66 +220,27 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void AddBoard(Bitmap bitmap, float w, float h){
-        Board = new Pedal(this);
-        ((Pedal)Board).PedalWidth = w;
-        ((Pedal)Board).PedalHeight = h;
-        ((Pedal)Board).type = "Board";
-        Board.setImageBitmap(bitmap);
-        layout.addView(Board);
+        if(board != null)
+            board.setImageBitmap(null);
+        board = new Board(this,h,w);
+        board.setImageBitmap(bitmap);
+        layout.addView(board);
+        deleteButton.bringToFront();
+        rotateButton.bringToFront();
     }
 
-    public int getProportion(int a, int b, int c)
+    public void AddNewPedal(Bitmap bitmap, String Type, String Name, String Brand, float PedalHeight, float PedalWidth)
     {
-        return (b * c)/a ;
+            ImageView p = new Pedal(this, bitmap, Type, Name, Brand, PedalHeight, PedalWidth);
+            ((Pedal)p).Resize((int) ((Board) board).BoardWidth, board.getWidth(), (int) ((Board) board).BoardHeight, board.getHeight());
+            p.setX((layout.getWidth() / 2));
+            p.setY((layout.getHeight() / 2) - 70);
+            layout.addView(p);
+            deleteButton.bringToFront();
+            rotateButton.bringToFront();
     }
 
-    public void AddNewPedal(Bitmap bitmap, float w, float h)
-    {
-        final ImageView p = new Pedal(this);
-        p.setImageBitmap(bitmap);
-        ((Pedal)p).PedalWidth = w;
-        ((Pedal)p).PedalHeight = h;
-        p.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
-        p.bringToFront();
-        p.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        int boardWidth = (int) ((Pedal)Board).PedalWidth;
-        int pedalWidth = (int) ((Pedal)p).PedalWidth;
-
-        int boardHeight = (int) ((Pedal)Board).PedalHeight;
-        int pedalHeight = (int) ((Pedal)p).PedalHeight;
-
-        int wi = getProportion(boardWidth, Board.getWidth(), pedalWidth);
-        int he = getProportion(boardHeight, Board.getHeight(), pedalHeight);
-
-        p.getLayoutParams().width = wi;
-        p.getLayoutParams().height = he;
-
-        p.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        moving = true;
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        if (moving) {
-                            p.setX(event.getRawX() - p.getWidth());
-                            p.setY(event.getRawY() - p.getHeight());
-                        }
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        moving = false;
-                        selectedImg = p;
-                        p.bringToFront();
-                        break;
-                }
-                return true;
-            }
-        });
-        layout.addView(p);
-    }
 
     @Override
     public void onBackPressed() {
