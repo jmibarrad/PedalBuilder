@@ -1,7 +1,3 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle" >
-    <solid
-        android:color="#FFF"
-        android:type="linear"
-        android:angle="135"/>
 </shape>

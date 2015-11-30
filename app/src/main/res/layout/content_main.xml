@@ -27,7 +27,8 @@
             android:drawableLeft="@android:drawable/ic_menu_rotate"
             android:layout_gravity="right|top"
             android:background="@drawable/round_button"
-            android:drawableTint="#131010" />
+            android:backgroundTint="#ffffff"
+            android:drawableTint="#231bb4" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
