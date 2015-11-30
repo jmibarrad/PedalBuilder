@@ -6,7 +6,7 @@ import android.widget.ImageView;
 /**
  * Created by Gabriel Paz on 11/29/2015.
  */
-public class Board extends CustomImgView{
+public class Board extends ImageView{
     public float BoardHeight;
     public float BoardWidth;
 
@@ -14,6 +14,5 @@ public class Board extends CustomImgView{
         super(context);
         this.BoardHeight = BoardHeight;
         this.BoardWidth = BoardWidth;
-        whatami = "Board";
     }
 }

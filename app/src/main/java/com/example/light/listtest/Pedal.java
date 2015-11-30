@@ -10,7 +10,7 @@ import android.widget.ImageView;
 /**
  * Created by Gabriel Paz on 11/22/2015.
  */
-public class Pedal extends CustomImgView {
+public class Pedal extends ImageView {
 
 
     public float PedalHeight;
@@ -33,7 +33,6 @@ public class Pedal extends CustomImgView {
                 FrameLayout.LayoutParams.WRAP_CONTENT));
         this.setScaleType(ImageView.ScaleType.FIT_CENTER);
         angle = 0;
-        whatami = "Pedal";
         setListener();
 
     }
