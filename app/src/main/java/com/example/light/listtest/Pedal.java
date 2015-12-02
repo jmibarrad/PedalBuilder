@@ -46,6 +46,7 @@ public class Pedal extends ImageView {
         this.getLayoutParams().height = he;
     }
 
+    float _dx, _dy = 0.0f;
     private void setListener()
     {
         final ImageView p = this;
@@ -56,11 +57,13 @@ public class Pedal extends ImageView {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         ((MainActivity) getContext()).moving = true;
+                        _dx = event.getRawX();
+                        _dy = event.getRawY();
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if (((MainActivity) p.getContext()).moving) {
-                            p.setX(event.getRawX() - p.getWidth());
-                            p.setY(event.getRawY() - p.getHeight());
+                        if (((MainActivity) p.getContext()).moving && (_dx != event.getRawX() || _dy != event.getRawY())) {
+                            p.setX(event.getRawX() - p.getWidth()/2);
+                            p.setY(event.getRawY() - p.getHeight()*3/2);
 
                         }
                         break;
