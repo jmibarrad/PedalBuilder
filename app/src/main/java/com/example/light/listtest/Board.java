@@ -8,14 +8,16 @@ import android.widget.ImageView;
  * Created by Gabriel Paz on 11/29/2015.
  */
 public class Board extends ImageView{
+    public String Id;
     public float BoardHeight;
     public float BoardWidth;
     public boolean resize;
 
-    public Board(Context context, float BoardHeight, float BoardWidth) {
+    public Board(Context context, String Id, float BoardHeight, float BoardWidth) {
         super(context);
         this.BoardHeight = BoardHeight;
         this.BoardWidth = BoardWidth;
+        this.Id = Id;
         resize = false;
         SetListener();
     }

@@ -1,10 +1,12 @@
 package com.example.light.listtest;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,14 +22,18 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseAnonymousUtils;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,11 +48,11 @@ public class MainActivity extends AppCompatActivity{
     ParseFile Img;
     Button rotateButton;
     Button deleteButton;
+    Button saveButton;
     ImageView selectedImg;
     ImageView board;
     boolean moving = true;
     FrameLayout layout;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +75,7 @@ public class MainActivity extends AppCompatActivity{
         layout = (FrameLayout)findViewById(R.id.fmlayout);
         rotateButton = (Button)findViewById(R.id.rotateButton);
         deleteButton = (Button)findViewById(R.id.deleteButton);
+        saveButton = (Button)findViewById(R.id.savebutton);
 
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
         // preparing list data
@@ -89,7 +96,7 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-        backup = new ArrayList<ImageView>();
+        backup = new ArrayList<>();
 
         expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
@@ -104,6 +111,7 @@ public class MainActivity extends AppCompatActivity{
                             public void done(List<ParseObject> objects, com.parse.ParseException e) {
                                 if (e == null) {
                                     Img = objects.get(childPosition).getParseFile("Image");
+                                    final String Code = objects.get(childPosition).getObjectId();
                                     final float w = objects.get(childPosition).getInt("Width");
                                     final float h = objects.get(childPosition).getInt("Height");
                                     Img.getDataInBackground(new GetDataCallback() {
@@ -111,7 +119,7 @@ public class MainActivity extends AppCompatActivity{
                                         public void done(byte[] data, com.parse.ParseException e) {
                                             if (e == null) {
                                                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                                AddBoard(bitmap, w, h);
+                                                AddBoard(bitmap, Code, w, h);
                                             }
                                         }
                                     });
@@ -128,6 +136,7 @@ public class MainActivity extends AppCompatActivity{
                                 @Override
                                 public void done(List<ParseObject> objects, com.parse.ParseException e) {
                                     if (e == null) {
+                                        final String Code = objects.get(childPosition).getObjectId();
                                         Img = objects.get(childPosition).getParseFile("Image");
                                         final String Name= objects.get(childPosition).getString("Name");
                                         final String Type= objects.get(childPosition).getString("Type");
@@ -139,7 +148,8 @@ public class MainActivity extends AppCompatActivity{
                                             public void done(byte[] data, com.parse.ParseException e) {
                                                 if (e == null) {
                                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                                    AddNewPedal(bitmap,Type,Name,Brand,h,w);
+                                                    AddNewPedal(bitmap, Code, Type, Name, Brand, h, w);
+
                                                 }
                                             }
                                         });
@@ -152,6 +162,114 @@ public class MainActivity extends AppCompatActivity{
                         }
 
                         break;
+
+                    case 2:
+                        ParseQuery<ParseObject> presetQuery = ParseQuery.getQuery("Presets");
+                        presetQuery.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                                if (e == null) {
+                                    String data = objects.get(childPosition).getString("Content");
+                                    String boardid = new String(data.split("-")[0]);
+                                    String pedalsdata = new String(data.split("-")[1]);
+                                    /*   backup.clear();
+                                    backup = new ArrayList<ImageView>(getPedals(pedalsdata[0]));
+                                    for(ImageView pedal : backup)
+                                    {
+                                        layout.addView(pedal);
+                                    }*/
+                                    ParseQuery<ParseObject> boardQuery = ParseQuery.getQuery("Board");
+                                    boardQuery.whereEqualTo("objectId", boardid);
+                                    boardQuery.findInBackground(new FindCallback<ParseObject>() {
+                                        @Override
+                                        public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                                            if (e == null) {
+                                                Img = objects.get(0).getParseFile("Image");
+                                                final String Code = objects.get(0).getObjectId();
+                                                final float w = objects.get(0).getInt("Width");
+                                                final float h = objects.get(0).getInt("Height");
+                                                Img.getDataInBackground(new GetDataCallback() {
+                                                    @Override
+                                                    public void done(byte[] data, com.parse.ParseException e) {
+                                                        if (e == null) {
+                                                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                                            AddBoard(bitmap, Code, w, h);
+                                                        }
+                                                    }
+                                                });
+
+                                            }
+                                        }
+                                    });
+                                    backup.clear();
+
+                                    String [] pedalsbuffer = pedalsdata.split("/");
+                                    final ArrayList<ProtoPedal> protoPedals = new ArrayList<ProtoPedal>();
+                                    String [] Codes = new String[pedalsbuffer.length];
+                                    int it = 0;
+                                    for(String pedal : pedalsbuffer)
+                                    {
+                                        ProtoPedal temp = new ProtoPedal();
+                                        temp.code = pedal.split(",")[0];
+                                        temp.x = Float.parseFloat(pedal.split(",")[1]);
+                                        temp.y = Float.parseFloat(pedal.split(",")[2]);
+                                        temp.angle = Float.parseFloat(pedal.split(",")[3]);
+                                        protoPedals.add(temp);
+                                        Codes[it] = temp.code;
+                                        it++;
+
+                                    }
+
+                                    ParseQuery<ParseObject> pedalsquery = ParseQuery.getQuery("Pedals");
+                                    pedalsquery.whereContainedIn("objectId", Arrays.asList(Codes));
+                                    pedalsquery.findInBackground(new FindCallback<ParseObject>() {
+                                        public void done(List<ParseObject> objectsl, ParseException e) {
+                                            if (e == null) {
+                                                for(int i = 0; i < objectsl.size(); i++)
+                                                {
+                                                    final int j = i;
+                                                    final String Code = objectsl.get(i).getObjectId();
+                                                    final ParseFile Img2 = objectsl.get(i).getParseFile("Image");
+                                                    final String Name= objectsl.get(i).getString("Name");
+                                                    final String Type= objectsl.get(i).getString("Type");
+                                                    final String Brand= objectsl.get(i).getString("Brand");
+                                                    final float w = objectsl.get(i).getInt("Width");
+                                                    final float h = objectsl.get(i).getInt("Height");
+                                                    float angle = 0;
+                                                    float x = 0;
+                                                    float y = 0;
+                                                    for(ProtoPedal p : protoPedals)
+                                                    {
+                                                        if(p.code.equals(Code))
+                                                        {
+                                                            angle = p.angle;
+                                                            x = p.x;
+                                                            y = p.y;
+                                                        }
+                                                    }
+                                                    final float finalX = x;
+                                                    final float finalY = y;
+                                                    final float finalAngle = angle;
+                                                    Img2.getDataInBackground(new GetDataCallback() {
+                                                        @Override
+                                                        public void done(byte[] data, com.parse.ParseException e) {
+                                                            if (e == null) {
+                                                                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                                                AddNewPedal(bitmap, Code, Type, Name, Brand, h, w, finalX, finalY, finalAngle);
+                                                            }
+                                                        }
+                                                    });
+
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                        //Log.d("ID: ", boardid);
+                        break;
+
                 }
                 if(board != null)
                     Toast.makeText(getApplicationContext(), listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition),
@@ -164,9 +282,9 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void onClick(View v) {
-                if(selectedImg != null){
-                    ((Pedal)selectedImg).angle = ((Pedal)selectedImg).angle + 90;
-                    selectedImg.setRotation(((Pedal)selectedImg).angle);
+                if (selectedImg != null) {
+                    ((Pedal) selectedImg).angle = ((Pedal) selectedImg).angle + 90;
+                    selectedImg.setRotation(((Pedal) selectedImg).angle);
                 }
             }
         });
@@ -182,7 +300,17 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               String toStore =  StringBuilderService.StringBuilder((Board) board, backup);
+                ParseObject preset = new ParseObject("Presets");
+                preset.put("Name","MyPreset");
+                preset.put("Content", toStore);
+                preset.saveInBackground();
 
+            }
+        });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -201,7 +329,8 @@ public class MainActivity extends AppCompatActivity{
         // Adding child data
         listDataHeader.add("Boards");
         listDataHeader.add("Pedals");
-        listDataHeader.add("Power Supplies");
+        listDataHeader.add("Presets");
+       // listDataHeader.add("Power Supplies");
 
         // Adding child data
         final List<String> boardsList = new ArrayList<>();
@@ -231,21 +360,35 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        final List<String> presetList = new ArrayList<>();
+        ParseQuery<ParseObject> presetQuery = ParseQuery.getQuery("Presets");
+        presetQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                if (e == null) {
+                    for (ParseObject obj : objects) {
+                        presetList.add(obj.getString("Name"));
+                    }
+                }
+            }
+        });
+
+
         List<String> powerSuppliesList = new ArrayList<String>();
 
         listDataChild.put(listDataHeader.get(0), boardsList);
         listDataChild.put(listDataHeader.get(1), pedalsList);
-        listDataChild.put(listDataHeader.get(2), powerSuppliesList);
+        listDataChild.put(listDataHeader.get(2), presetList);
     }
 
-    public void AddBoard(Bitmap bitmap, float w, float h){
+    public void AddBoard(Bitmap bitmap, String code, float w, float h){
         boolean mustresize = false;
         if(board != null)
         {
             board.setImageBitmap(null);
             mustresize = true;
         }
-        board = new Board(this,h,w);
+        board = new Board(this,code,h,w);
         if(mustresize)
             ((Board)board).resize = true;
         board.setImageBitmap(bitmap);
@@ -264,16 +407,16 @@ public class MainActivity extends AppCompatActivity{
             {
                 layout.removeView(TmpArray.get(i));
                 Pedal temp = (Pedal)TmpArray.get(i);
-                AddNewPedal(((BitmapDrawable) TmpArray.get(i).getDrawable()).getBitmap(), temp.Type, temp.Name, temp.Brand, temp.PedalHeight, temp.PedalWidth);
+                AddNewPedal(((BitmapDrawable) TmpArray.get(i).getDrawable()).getBitmap(), temp.Id,temp.Type, temp.Name, temp.Brand, temp.PedalHeight, temp.PedalWidth);
             }
 
             ((Board)board).resize = false;
         }
     }
 
-    public void AddNewPedal(Bitmap bitmap, String Type, String Name, String Brand, float PedalHeight, float PedalWidth)
+    public void AddNewPedal(Bitmap bitmap, String code, String Type, String Name, String Brand, float PedalHeight, float PedalWidth)
     {
-            ImageView p = new Pedal(this, bitmap, Type, Name, Brand, PedalHeight, PedalWidth);
+            ImageView p = new Pedal(this, code, bitmap, Type, Name, Brand, PedalHeight, PedalWidth);
             ((Pedal)p).Resize((int) ((Board) board).BoardWidth, board.getWidth(), (int) ((Board) board).BoardHeight, board.getHeight());
             p.setX((layout.getWidth() / 2));
             p.setY((layout.getHeight() / 2) - 70);
@@ -283,7 +426,70 @@ public class MainActivity extends AppCompatActivity{
             rotateButton.bringToFront();
     }
 
+    public void AddNewPedal(Bitmap bitmap, String code, String Type, String Name, String Brand, float PedalHeight, float PedalWidth, float x, float y, float angle)
+    {
+        ImageView p = new Pedal(this, code, bitmap, Type, Name, Brand, PedalHeight, PedalWidth);
+        ((Pedal)p).Resize((int) ((Board) board).BoardWidth, board.getWidth(), (int) ((Board) board).BoardHeight, board.getHeight());
+        p.setX(x);
+        p.setY(y);
+        ((Pedal)p).angle = angle;
+        p.setRotation(((Pedal)p).angle);
+        backup.add(p);
+        layout.addView(p);
+        deleteButton.bringToFront();
+        rotateButton.bringToFront();
+    }
 
+
+
+    public Pedal getPedal(String code)
+    {
+        final MainActivity m = this;
+        final Pedal[] toreturn = new Pedal[1];
+        ParseQuery<ParseObject> pedalQuery = ParseQuery.getQuery("Pedals");
+        pedalQuery.getInBackground(code, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, com.parse.ParseException e) {
+                if (e == null) {
+                    ParseFile Img = object.getParseFile("Image");
+                    final String Code = object.getObjectId();
+                    final String Name= object.getString("Name");
+                    final String Type= object.getString("Type");
+                    final String Brand= object.getString("Brand");
+                    final float w = object.getInt("Width");
+                    final float h = object.getInt("Height");
+                    Img.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(byte[] data, com.parse.ParseException e) {
+                            if (e == null) {
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                ImageView toReturn = new Pedal(m, Code, bitmap,Type,Name,Brand,h,w);
+                                ((Pedal)toReturn).Id = Code;
+                                toreturn[0] = (Pedal) toReturn;;
+                            }
+                        }
+                    });
+
+                }
+            }
+        });
+        return toreturn[0];
+    }
+
+    public ArrayList<Pedal> getPedals(String pedalsdata) {
+        String [] buffer = pedalsdata.split("/");
+        ArrayList<Pedal> listToReturn = new ArrayList<>();
+        for(int i = 0; i < buffer.length; i++)
+        {
+            ImageView pedal = getPedal(buffer[i].split(",")[0]);
+            pedal.setX(Float.parseFloat(buffer[i].split(",")[1]));
+            pedal.setY(Float.parseFloat(buffer[i].split(",")[2]));
+            ((Pedal)pedal).angle = Integer.parseInt(buffer[i].split(",")[3]);
+            pedal.setRotation(((Pedal)pedal).angle);
+            listToReturn.add((Pedal)pedal);
+        }
+        return listToReturn;
+    }
 
     @Override
     public void onBackPressed() {

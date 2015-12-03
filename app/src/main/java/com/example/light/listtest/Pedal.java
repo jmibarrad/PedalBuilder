@@ -12,7 +12,7 @@ import android.widget.ImageView;
  */
 public class Pedal extends ImageView {
 
-
+    public String Id;
     public float PedalHeight;
     public float PedalWidth;
     public String Type;
@@ -20,9 +20,10 @@ public class Pedal extends ImageView {
     public String Brand;
     public float angle;
 
-    public Pedal(Context context, Bitmap bitmap, String Type, String Name, String Brand, float PedalHeight, float PedalWidth)
+    public Pedal(Context context, String Id, Bitmap bitmap, String Type, String Name, String Brand, float PedalHeight, float PedalWidth)
     {
         super(context);
+        this.Id = Id;
         this.Type = Type;
         this.Name = Name;
         this.Brand = Brand;
@@ -84,5 +85,10 @@ public class Pedal extends ImageView {
                 return true;
             }
         });
+    }
+
+    public String toString()
+    {
+        return this.Id + "," + this.getX() + "," + this.getY() + "," + this.angle;
     }
 }
