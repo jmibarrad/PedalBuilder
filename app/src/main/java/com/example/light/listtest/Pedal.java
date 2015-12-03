@@ -62,14 +62,23 @@ public class Pedal extends ImageView {
                         break;
                     case MotionEvent.ACTION_MOVE:
                         if (((MainActivity) p.getContext()).moving && (_dx != event.getRawX() || _dy != event.getRawY())) {
-                            p.setX(event.getRawX() - p.getWidth()/2);
-                            p.setY(event.getRawY() - p.getHeight()*3/2);
-
+                            for(ImageView pedal : ((MainActivity)p.getContext()).backup)
+                            {
+                                if(pedal == p)
+                                {
+                                    p.setX(event.getRawX() - p.getWidth()/2);
+                                    p.setY(event.getRawY() - p.getHeight()*3/2);
+                                    pedal.setX(p.getX());
+                                    pedal.setY(p.getY());
+                                    break;
+                                }
+                            }
                         }
                         break;
                     case MotionEvent.ACTION_UP:
                         ((MainActivity) p.getContext()).moving = false;
                         ((MainActivity) p.getContext()).selectedImg = p;
+
                         break;
                 }
                 return true;

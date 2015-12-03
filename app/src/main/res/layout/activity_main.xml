@@ -24,7 +24,7 @@
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="170dp" android:layout_height="113dp"
-            android:background="@drawable/side_nav_bar"
+            android:background="#ffffff"
             android:paddingBottom="5dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"

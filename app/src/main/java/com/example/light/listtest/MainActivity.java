@@ -3,6 +3,7 @@ package com.example.light.listtest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity{
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
+    List<ImageView> backup;
     ParseFile Img;
     Button rotateButton;
     Button deleteButton;
@@ -86,6 +88,8 @@ public class MainActivity extends AppCompatActivity{
                 return false;
             }
         });
+
+        backup = new ArrayList<ImageView>();
 
         expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
@@ -170,8 +174,11 @@ public class MainActivity extends AppCompatActivity{
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedImg != null)
-                    selectedImg.setImageBitmap(null);
+                if (selectedImg != null) {
+                    layout.removeView(selectedImg);
+                    backup.remove(selectedImg);
+                    selectedImg = null;
+                }
             }
         });
 
@@ -232,13 +239,36 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void AddBoard(Bitmap bitmap, float w, float h){
+        boolean mustresize = false;
         if(board != null)
+        {
             board.setImageBitmap(null);
+            mustresize = true;
+        }
         board = new Board(this,h,w);
+        if(mustresize)
+            ((Board)board).resize = true;
         board.setImageBitmap(bitmap);
-        layout.addView(board);
         deleteButton.bringToFront();
         rotateButton.bringToFront();
+        layout.addView(board);
+    }
+
+    public void RestorePedals()
+    {
+        if(backup.size() > 0)
+        {
+            List<ImageView> TmpArray = new ArrayList<>(backup);
+            backup.clear();
+            for(int i = 0; i < TmpArray.size(); i++)
+            {
+                layout.removeView(TmpArray.get(i));
+                Pedal temp = (Pedal)TmpArray.get(i);
+                AddNewPedal(((BitmapDrawable) TmpArray.get(i).getDrawable()).getBitmap(), temp.Type, temp.Name, temp.Brand, temp.PedalHeight, temp.PedalWidth);
+            }
+
+            ((Board)board).resize = false;
+        }
     }
 
     public void AddNewPedal(Bitmap bitmap, String Type, String Name, String Brand, float PedalHeight, float PedalWidth)
@@ -247,6 +277,7 @@ public class MainActivity extends AppCompatActivity{
             ((Pedal)p).Resize((int) ((Board) board).BoardWidth, board.getWidth(), (int) ((Board) board).BoardHeight, board.getHeight());
             p.setX((layout.getWidth() / 2));
             p.setY((layout.getHeight() / 2) - 70);
+            backup.add(p);
             layout.addView(p);
             deleteButton.bringToFront();
             rotateButton.bringToFront();
