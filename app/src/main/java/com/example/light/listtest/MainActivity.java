@@ -443,6 +443,55 @@ public class MainActivity extends AppCompatActivity{
 
 
 
+    public Pedal getPedal(String code)
+    {
+        final MainActivity m = this;
+        final Pedal[] toreturn = new Pedal[1];
+        ParseQuery<ParseObject> pedalQuery = ParseQuery.getQuery("Pedals");
+        pedalQuery.getInBackground(code, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, com.parse.ParseException e) {
+                if (e == null) {
+                    ParseFile Img = object.getParseFile("Image");
+                    final String Code = object.getObjectId();
+                    final String Name= object.getString("Name");
+                    final String Type= object.getString("Type");
+                    final String Brand= object.getString("Brand");
+                    final float w = object.getInt("Width");
+                    final float h = object.getInt("Height");
+                    Img.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(byte[] data, com.parse.ParseException e) {
+                            if (e == null) {
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                ImageView toReturn = new Pedal(m, Code, bitmap,Type,Name,Brand,h,w);
+                                ((Pedal)toReturn).Id = Code;
+                                toreturn[0] = (Pedal) toReturn;;
+                            }
+                        }
+                    });
+
+                }
+            }
+        });
+        return toreturn[0];
+    }
+
+    public ArrayList<Pedal> getPedals(String pedalsdata) {
+        String [] buffer = pedalsdata.split("/");
+        ArrayList<Pedal> listToReturn = new ArrayList<>();
+        for(int i = 0; i < buffer.length; i++)
+        {
+            ImageView pedal = getPedal(buffer[i].split(",")[0]);
+            pedal.setX(Float.parseFloat(buffer[i].split(",")[1]));
+            pedal.setY(Float.parseFloat(buffer[i].split(",")[2]));
+            ((Pedal)pedal).angle = Integer.parseInt(buffer[i].split(",")[3]);
+            pedal.setRotation(((Pedal)pedal).angle);
+            listToReturn.add((Pedal)pedal);
+        }
+        return listToReturn;
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
