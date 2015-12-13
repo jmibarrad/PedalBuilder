@@ -12,11 +12,11 @@ public class StringBuilderService {
     public static String StringBuilder(Board board, List<ImageView> Pedals)
     {
         String buffer = "";
-        buffer = buffer + board.Id + "-";
+        buffer = buffer + board.Id + "split";
 
         for(int i = 0; i < Pedals.size(); i++)
         {
-            buffer = buffer + ((Pedal)Pedals.get(i)).toString();
+            buffer = buffer + Pedals.get(i).toString();
             if((i+1)!=Pedals.size())
                 buffer = buffer + "/";
         }

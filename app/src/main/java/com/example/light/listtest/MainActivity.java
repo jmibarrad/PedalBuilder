@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        final ParseUser currentUser = ParseUser.getCurrentUser();
 
         if(currentUser != null) {
 
@@ -195,7 +195,6 @@ public class MainActivity extends AppCompatActivity{
                                 }
                             }
                         });
-                        //  Log.d("pedaldata:" , pedaldata);
                         break;
                 }
                 if(board != null)
@@ -226,17 +225,16 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (backup.size() > 0) {
                     String toStore = StringBuilderService.StringBuilder((Board) board, backup);
-                    ParseObject preset = new ParseObject("Presets");
-                    preset.put("Name", "MyPreset");
-                    preset.put("Content", toStore);
-                    preset.saveInBackground();
-                    Toast.makeText(getApplicationContext(), "Succes! Pedalboard saved",
-                            Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, SaveBoard.class);
+                    intent.putExtra("UserID",currentUser.getObjectId());
+                    intent.putExtra("Data",toStore);
+                    startActivity(intent);
                 } else
                     Toast.makeText(getApplicationContext(), "ERROR: Choose At Least One Pedal",
                             Toast.LENGTH_SHORT).show();
