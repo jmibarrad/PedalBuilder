@@ -12,6 +12,7 @@ public class Board extends ImageView{
     public float BoardHeight;
     public float BoardWidth;
     public boolean resize;
+    public boolean loadPresets;
 
     public Board(Context context, String Id, float BoardHeight, float BoardWidth) {
         super(context);
@@ -19,6 +20,7 @@ public class Board extends ImageView{
         this.BoardWidth = BoardWidth;
         this.Id = Id;
         resize = false;
+        loadPresets = false;
         SetListener();
     }
 
@@ -32,6 +34,10 @@ public class Board extends ImageView{
                 {
                     ((MainActivity)b.getContext()).RestorePedals();
                     ((Board)b).resize = false;
+                }else if(loadPresets)
+                {
+                    ((MainActivity)b.getContext()).LoadPedalFromPreset();
+                    ((Board)b).loadPresets = false;
                 }
             }
         });
