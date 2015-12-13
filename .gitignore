@@ -2,6 +2,12 @@
 *.apk
 *.ap_
 
+## Intellij project
+*.iml
+
+## Directory-based project format:
+.idea/
+
 # Files for the Dalvik VM
 *.dex
 

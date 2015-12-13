@@ -24,7 +24,7 @@
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="170dp" android:layout_height="113dp"
-            android:background="@drawable/side_nav_bar"
+            android:background="#ffffff"
             android:paddingBottom="5dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
@@ -42,9 +42,16 @@
 
         <ExpandableListView
             android:id="@+id/lvExp"
-            android:layout_height="match_parent"
+            android:layout_height="139dp"
             android:layout_width="170dp"
             android:contextClickable="true"
             android:background="#ffffff" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="144dp"
+            android:layout_height="match_parent"
+            android:text="Save"
+            android:id="@+id/savebutton" />
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>
