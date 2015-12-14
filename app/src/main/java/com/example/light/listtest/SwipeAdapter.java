@@ -42,7 +42,7 @@ public class SwipeAdapter extends PagerAdapter{
 
     @Override
     public int getCount() {
-        return 3;
+        return total_found;
     }
 
     @Override
