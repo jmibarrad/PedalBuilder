@@ -42,7 +42,7 @@ public class SwipeAdapter extends PagerAdapter{
 
     @Override
     public int getCount() {
-        return total_found;
+        return 2;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class SwipeAdapter extends PagerAdapter{
                             }
                         }
                     });
-                    total_found =objects.size();
+                    total_found = objects.size();
                     preview.setImageBitmap(bitmap);
                     preview_name.setText(objects.get(position).getString("Name"));
                 }

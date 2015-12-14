@@ -496,6 +496,9 @@ public class MainActivity extends AppCompatActivity{
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.search) {
+            Intent intent = new Intent(MainActivity.this, SearchBoards.class);
+            startActivity(intent);
+            finish();
             return true;
         }
 
