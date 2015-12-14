@@ -1,10 +1,14 @@
 package com.example.light.listtest;
 
+import android.app.Activity;
+import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
@@ -29,6 +33,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -73,7 +82,7 @@ public class MainActivity extends AppCompatActivity{
         layout = (FrameLayout)findViewById(R.id.fmlayout);
         rotateButton = (Button)findViewById(R.id.rotateButton);
         deleteButton = (Button)findViewById(R.id.deleteButton);
-        saveButton = (Button)findViewById(R.id.savebutton);
+        saveButton = (Button)findViewById(R.id.saveButton);
 
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
         // preparing list data
@@ -116,7 +125,7 @@ public class MainActivity extends AppCompatActivity{
                                         public void done(byte[] data, com.parse.ParseException e) {
                                             if (e == null) {
                                                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                                AddBoard(bitmap, Code, w, h,false);
+                                                AddBoard(bitmap, Code, w, h, false);
                                             }
                                         }
                                     });
@@ -126,7 +135,7 @@ public class MainActivity extends AppCompatActivity{
                         });
                         break;
                     case 1:
-                        if(board != null){
+                        if (board != null) {
 
                             ParseQuery<ParseObject> pedalQuery = ParseQuery.getQuery("Pedals");
                             pedalQuery.findInBackground(new FindCallback<ParseObject>() {
@@ -135,9 +144,9 @@ public class MainActivity extends AppCompatActivity{
                                     if (e == null) {
                                         final String Code = objects.get(childPosition).getObjectId();
                                         Img = objects.get(childPosition).getParseFile("Image");
-                                        final String Name= objects.get(childPosition).getString("Name");
-                                        final String Type= objects.get(childPosition).getString("Type");
-                                        final String Brand= objects.get(childPosition).getString("Brand");
+                                        final String Name = objects.get(childPosition).getString("Name");
+                                        final String Type = objects.get(childPosition).getString("Type");
+                                        final String Brand = objects.get(childPosition).getString("Brand");
                                         final float w = objects.get(childPosition).getInt("Width");
                                         final float h = objects.get(childPosition).getInt("Height");
                                         Img.getDataInBackground(new GetDataCallback() {
@@ -153,8 +162,8 @@ public class MainActivity extends AppCompatActivity{
                                     }
                                 }
                             });
-                        }else{
-                            Toast.makeText(getApplicationContext(), "ERROR: Choose Board First" ,
+                        } else {
+                            Toast.makeText(getApplicationContext(), "ERROR: Choose Board First",
                                     Toast.LENGTH_SHORT).show();
                         }
 
@@ -197,7 +206,7 @@ public class MainActivity extends AppCompatActivity{
                         });
                         break;
                 }
-                if(board != null)
+                if (board != null)
                     Toast.makeText(getApplicationContext(), listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition),
                             Toast.LENGTH_SHORT).show();
                 return false;
@@ -225,20 +234,20 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //board.setImageBitmap(takeScreenShot());
+
                 if (backup.size() > 0) {
                     String toStore = StringBuilderService.StringBuilder((Board) board, backup);
                     Intent intent = new Intent(MainActivity.this, SaveBoard.class);
-                    intent.putExtra("UserID",currentUser.getObjectId());
-                    intent.putExtra("Data",toStore);
+                    intent.putExtra("UserID", currentUser.getObjectId());
+                    intent.putExtra("Data", toStore);
                     startActivity(intent);
                 } else
                     Toast.makeText(getApplicationContext(), "ERROR: Choose At Least One Pedal",
                             Toast.LENGTH_SHORT).show();
-
             }
         });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -328,6 +337,8 @@ public class MainActivity extends AppCompatActivity{
         board.setImageBitmap(bitmap);
         layout.addView(rotateButton);
         layout.addView(deleteButton);
+        layout.addView(saveButton);
+        saveButton.bringToFront();
         deleteButton.bringToFront();
         rotateButton.bringToFront();
         layout.addView(board);
@@ -362,6 +373,7 @@ public class MainActivity extends AppCompatActivity{
         p.bringToFront();
         deleteButton.bringToFront();
         rotateButton.bringToFront();
+        saveButton.bringToFront();
     }
 
     public void AddNewPedal(Bitmap bitmap, String code, String Type, String Name, String Brand, float PedalHeight, float PedalWidth, float x, float y, float angle)
@@ -377,6 +389,7 @@ public class MainActivity extends AppCompatActivity{
         layout.addView(p);
         deleteButton.bringToFront();
         rotateButton.bringToFront();
+        saveButton.bringToFront();
     }
 
     public void LoadPedalFromPreset()
@@ -463,6 +476,17 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
+    private Bitmap takeScreenShot()
+    {
+        layout.setDrawingCacheEnabled(true);
+        layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        layout.buildDrawingCache(true);
+
+        Bitmap b = Bitmap.createBitmap(layout.getDrawingCache());
+        layout.destroyDrawingCache();
+        return b;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -471,7 +495,7 @@ public class MainActivity extends AppCompatActivity{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.search) {
             return true;
         }
 

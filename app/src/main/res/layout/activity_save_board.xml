@@ -25,24 +25,32 @@
 
                 <EditText android:id="@+id/boardName" android:layout_width="match_parent"
                     android:layout_height="wrap_content" android:hint="Pedalboard Name"
-                    android:inputType="textEmailAddress" android:maxLines="1"
+                    android:inputType="text" android:maxLines="1"
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-            </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Category"
+        android:id="@+id/PedalBoardCategory"
+        android:textAlignment="gravity"
+        android:gravity="left"
+        android:textColor="#452020" />
 
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/categoryDropDown"
-        android:spinnerMode="dropdown" />
+        android:hint="Category"
+        android:spinnerMode="dialog"
+        android:foreground="#ebebeb" />
 
     <LinearLayout
         android:orientation="horizontal"

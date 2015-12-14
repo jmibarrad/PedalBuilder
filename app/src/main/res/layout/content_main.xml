@@ -38,6 +38,18 @@
             android:backgroundTint="#ffffff"
             android:drawableTint="#231bb4" />
 
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/saveButton"
+            android:drawableLeft="@android:drawable/ic_menu_save"
+            android:layout_gravity="right|top"
+            android:layout_marginTop="90dp"
+            android:backgroundTint="#ffffff"
+            android:drawableTint="#231bb4"
+            android:background="@drawable/round_button" />
+
     </FrameLayout>
 
 </RelativeLayout>

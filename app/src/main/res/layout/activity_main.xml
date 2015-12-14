@@ -42,16 +42,10 @@
 
         <ExpandableListView
             android:id="@+id/lvExp"
-            android:layout_height="139dp"
+            android:layout_height="match_parent"
             android:layout_width="170dp"
             android:contextClickable="true"
             android:background="#ffffff" />
 
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="144dp"
-            android:layout_height="match_parent"
-            android:text="Save"
-            android:id="@+id/savebutton" />
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>
