@@ -1,6 +1,8 @@
 package com.example.light.listtest;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,7 +13,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.parse.ParseFile;
 import com.parse.ParseObject;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by Gabriel Paz on 12/13/2015.
@@ -19,6 +24,7 @@ import com.parse.ParseObject;
 public class SaveBoard extends AppCompatActivity {
     String boardmot;
     String userId;
+    Bitmap preview;
     String data;
     Button savebutton;
     Button cancelbutton;
@@ -33,6 +39,8 @@ public class SaveBoard extends AppCompatActivity {
         if (extras != null) {
             userId = extras.getString("UserID");
             data = extras.getString("Data");
+            byte[] array = extras.getByteArray("Preview");
+            preview = BitmapFactory.decodeByteArray(array, 0, array.length);
         }
 
         savebutton = (Button)findViewById(R.id.SaveBtn);
@@ -52,8 +60,16 @@ public class SaveBoard extends AppCompatActivity {
                     preset.put("Content", data);
                     preset.put("User", userId);
                     preset.put("Category", Category.getSelectedItem().toString());
+
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    preview.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    ParseFile imgFile = new ParseFile(boardmot+".png", stream.toByteArray());
+                    imgFile.saveInBackground();
+                    preset.put("Preview", imgFile);
+
+
                     preset.saveInBackground();
-                    Toast.makeText(getApplicationContext(), "Succes! Pedalboard saved",
+                    Toast.makeText(getApplicationContext(), "Success! Pedalboard saved",
                             Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(SaveBoard.this, MainActivity.class);
                     startActivity(intent);

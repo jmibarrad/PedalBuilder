@@ -10,12 +10,12 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
+        android:name=".ParseService"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="PedalBoard Builder"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name = ".ParseService">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -24,6 +24,7 @@
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -34,8 +35,9 @@
         <activity
             android:name=".SaveBoard"
             android:label="@string/title_activity_save_board"
-            android:screenOrientation = "landscape">
-
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity android:name=".SearchBoards" >
         </activity>
     </application>
 

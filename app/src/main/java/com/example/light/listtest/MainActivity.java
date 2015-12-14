@@ -1,15 +1,11 @@
 package com.example.light.listtest;
 
-import android.app.Activity;
-import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
+
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -25,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -34,10 +29,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -78,6 +69,10 @@ public class MainActivity extends AppCompatActivity{
 
         }
 
+        //Call Search
+        /*Intent intent = new Intent(MainActivity.this, SearchBoards.class);
+        startActivity(intent);
+        finish();*/
 
         layout = (FrameLayout)findViewById(R.id.fmlayout);
         rotateButton = (Button)findViewById(R.id.rotateButton);
@@ -244,6 +239,11 @@ public class MainActivity extends AppCompatActivity{
                     Intent intent = new Intent(MainActivity.this, SaveBoard.class);
                     intent.putExtra("UserID", currentUser.getObjectId());
                     intent.putExtra("Data", toStore);
+                    Bitmap bmp = takeScreenShot();
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+                    intent.putExtra("Preview", stream.toByteArray());
                     startActivity(intent);
                 } else
                     Toast.makeText(getApplicationContext(), "ERROR: Choose At Least One Pedal",
@@ -476,7 +476,7 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-    private Bitmap takeScreenShot()
+    public Bitmap takeScreenShot()
     {
         layout.setDrawingCacheEnabled(true);
         layout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
