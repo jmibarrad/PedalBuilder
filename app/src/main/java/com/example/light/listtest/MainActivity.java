@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity{
                             public void done(List<ParseObject> objects, com.parse.ParseException e) {
                                 if (e == null) {
                                     String data = objects.get(childPosition).getString("Content");
-                                    String boardid = new String(data.split("split")[0]);
+                                    String boardid = data.split("split")[0];
                                     setPedaldata(data.split("split")[1]);
                                     ParseQuery<ParseObject> boardQuery = ParseQuery.getQuery("Board");
                                     boardQuery.whereEqualTo("objectId", boardid);
@@ -192,7 +192,6 @@ public class MainActivity extends AppCompatActivity{
                                                         }
                                                     }
                                                 });
-
                                             }
                                         }
                                     });

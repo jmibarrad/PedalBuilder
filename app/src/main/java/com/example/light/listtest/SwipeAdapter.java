@@ -34,15 +34,15 @@ public class SwipeAdapter extends PagerAdapter{
 
     private Context ctx;
     final ParseUser currentUser = ParseUser.getCurrentUser();
-    public SwipeAdapter(Context ctx){
+    public SwipeAdapter(Context ctx, List<ParseObject> fromClass){
         this.ctx = ctx;
-
-
+        objectsList = fromClass;
     }
 
     @Override
     public int getCount() {
-        return 2;
+
+        return objectsList.size();
     }
 
     @Override
@@ -56,8 +56,12 @@ public class SwipeAdapter extends PagerAdapter{
         item_view = li.inflate(R.layout.swipe_layout, container, false);
         preview = (ImageView)item_view.findViewById(R.id.preview);
         preview_name = (TextView)item_view.findViewById(R.id.preview_name);
-        query(position, "", "");
+        //query(position, "", "");
 
+        bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+        preview.setImageBitmap(bitmap); //esto solo se asigna una vez
+        preview_name.setText(objectsList.get(position).getString("Name")); //
 
         container.addView(item_view);
         return item_view;
@@ -77,11 +81,10 @@ public class SwipeAdapter extends PagerAdapter{
 
 
         presetBoardQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
             public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                if (e == null){
+                if (e == null) {
                     Img = objects.get(position).getParseFile("Preview");
-                    Img.getDataInBackground(new GetDataCallback(){
+                    Img.getDataInBackground(new GetDataCallback() {
                         @Override
                         public void done(byte[] data, com.parse.ParseException e) {
                             if (e == null) {
@@ -89,12 +92,14 @@ public class SwipeAdapter extends PagerAdapter{
                             }
                         }
                     });
-                    total_found = objects.size();
-                    preview.setImageBitmap(bitmap);
-                    preview_name.setText(objects.get(position).getString("Name"));
+                    initParseObjectList(objects);
                 }
 
             }
         });
+    }
+
+    void initParseObjectList(List<ParseObject> objects_query){
+        objectsList = objects_query;
     }
 }
