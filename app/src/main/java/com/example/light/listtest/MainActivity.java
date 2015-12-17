@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity{
     boolean moving = true;
     FrameLayout layout;
     String pedalsdata;
+    String searchedPresetData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,15 +59,16 @@ public class MainActivity extends AppCompatActivity{
 
         final ParseUser currentUser = ParseUser.getCurrentUser();
 
-        if(currentUser != null) {
-
-
-        } else {
-
+        if(currentUser == null){
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
+        }
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            searchedPresetData = extras.getString("Data");
+            Log.d("The Data Is: ", searchedPresetData);
         }
 
 
@@ -471,7 +473,9 @@ public class MainActivity extends AppCompatActivity{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.search) {
+            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+            startActivity(intent);
             return true;
         }
 

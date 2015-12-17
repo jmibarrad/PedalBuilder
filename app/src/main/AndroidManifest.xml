@@ -35,7 +35,16 @@
             android:name=".SaveBoard"
             android:label="@string/title_activity_save_board"
             android:screenOrientation = "landscape">
-
+        </activity>
+        <activity
+            android:name=".SearchActivity"
+            android:label="@string/title_activity_search_layout"
+            android:screenOrientation = "landscape">
+        </activity>
+        <activity
+            android:name=".SearchListActivity"
+            android:label="@string/title_activity_searched_boards_layout"
+            android:screenOrientation = "landscape">
         </activity>
     </application>
 

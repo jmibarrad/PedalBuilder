@@ -19,4 +19,6 @@
         completions."
     </string>
     <string name="title_activity_save_board" />
+    <string name="title_activity_search_layout" />
+    <string name="title_activity_searched_boards_layout" />
 </resources>
