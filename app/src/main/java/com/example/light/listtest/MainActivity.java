@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity{
         if (extras != null) {
             searchedPresetData = extras.getString("Data");
             Log.d("The Data Is: ", searchedPresetData);
+            retrieveFromSearchedPreset();
         }
 
 
@@ -234,8 +235,8 @@ public class MainActivity extends AppCompatActivity{
                 if (backup.size() > 0) {
                     String toStore = StringBuilderService.StringBuilder((Board) board, backup);
                     Intent intent = new Intent(MainActivity.this, SaveBoard.class);
-                    intent.putExtra("UserID",currentUser.getObjectId());
-                    intent.putExtra("Data",toStore);
+                    intent.putExtra("UserID", currentUser.getObjectId());
+                    intent.putExtra("Data", toStore);
                     startActivity(intent);
                 } else
                     Toast.makeText(getApplicationContext(), "ERROR: Choose At Least One Pedal",
@@ -261,7 +262,7 @@ public class MainActivity extends AppCompatActivity{
         // Adding child data
         listDataHeader.add("Boards");
         listDataHeader.add("Pedals");
-        listDataHeader.add("Presets");
+        listDataHeader.add("My Presets");
         // listDataHeader.add("Power Supplies");
 
         // Adding child data
@@ -293,7 +294,7 @@ public class MainActivity extends AppCompatActivity{
         });
 
         final List<String> presetList = new ArrayList<>();
-        ParseQuery<ParseObject> presetQuery = ParseQuery.getQuery("Presets");
+        ParseQuery<ParseObject> presetQuery = ParseQuery.getQuery("Presets").whereEqualTo("User", ParseUser.getCurrentUser().getObjectId());;
         presetQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, com.parse.ParseException e) {
@@ -447,6 +448,36 @@ public class MainActivity extends AppCompatActivity{
 
     public void setPedaldata(String pedaldata){
         this.pedalsdata = new String(pedaldata);
+    }
+
+    public void retrieveFromSearchedPreset()
+    {
+        String data = searchedPresetData;
+        String boardid = new String(data.split("split")[0]);
+        setPedaldata(data.split("split")[1]);
+        ParseQuery<ParseObject> boardQuery = ParseQuery.getQuery("Board");
+        boardQuery.whereEqualTo("objectId", boardid);
+        boardQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                if (e == null) {
+                    Img = objects.get(0).getParseFile("Image");
+                    final String Code = objects.get(0).getObjectId();
+                    final float w = objects.get(0).getInt("Width");
+                    final float h = objects.get(0).getInt("Height");
+                    Img.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(byte[] data, com.parse.ParseException e) {
+                            if (e == null) {
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                AddBoard(bitmap, Code, w, h, true);
+                            }
+                        }
+                    });
+
+                }
+            }
+        });
     }
     @Override
     public void onBackPressed() {
