@@ -18,5 +18,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="title_activity_save_board">Save PedalBoard</string>>
+    <string name="title_activity_save_board">Save PedalBoard</string>
+    <string name="title_activity_search_boards" />>
 </resources>

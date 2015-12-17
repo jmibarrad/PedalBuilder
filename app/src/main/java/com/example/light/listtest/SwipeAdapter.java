@@ -58,7 +58,7 @@ public class SwipeAdapter extends PagerAdapter{
         preview_name = (TextView)item_view.findViewById(R.id.preview_name);
         //query(position, "", "");
 
-        bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+       // bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
         preview.setImageBitmap(bitmap); //esto solo se asigna una vez
         preview_name.setText(objectsList.get(position).getString("Name")); //
