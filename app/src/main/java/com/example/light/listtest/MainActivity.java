@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity{
         });
 
         final List<String> presetList = new ArrayList<>();
-        ParseQuery<ParseObject> presetQuery = ParseQuery.getQuery("Presets");
+        ParseQuery<ParseObject> presetQuery = ParseQuery.getQuery("Presets").whereEqualTo("User", ParseUser.getCurrentUser());
         presetQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, com.parse.ParseException e) {
@@ -510,27 +510,6 @@ public class MainActivity extends AppCompatActivity{
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        final List<Bitmap> bitmaplist = new ArrayList<>();
-        ParseQuery<ParseObject> presetQuery = ParseQuery.getQuery("Presets");
-        presetQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                if (e == null) {
-                    for (ParseObject obj : objects) {
-                        final ParseFile file = obj.getParseFile("Preview");
-                        file.getDataInBackground(new GetDataCallback() {
-                            @Override
-                            public void done(byte[] data, com.parse.ParseException e) {
-                                if (e == null) {
-                                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                    bitmaplist.add(bitmap);
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        });
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.search) {

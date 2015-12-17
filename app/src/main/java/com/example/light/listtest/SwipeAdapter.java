@@ -28,17 +28,14 @@ public class SwipeAdapter extends PagerAdapter{
     ParseFile Img;
     Bitmap bitmap;
     List<ParseObject> objectsList;
-    List<Bitmap>bitmaps;
     ImageView preview;
     TextView preview_name;
     View item_view;
-    int total_found;
 
     private Context ctx;
     final ParseUser currentUser = ParseUser.getCurrentUser();
-    public SwipeAdapter(Context ctx, List<ParseObject> fromClass, List<Bitmap> bitmaps){
+    public SwipeAdapter(Context ctx, List<ParseObject> fromClass){
         this.ctx = ctx;
-        this.bitmaps = bitmaps;
         objectsList = fromClass;
     }
 
@@ -58,11 +55,21 @@ public class SwipeAdapter extends PagerAdapter{
         item_view = li.inflate(R.layout.swipe_layout, container, false);
         preview = (ImageView)item_view.findViewById(R.id.preview);
         preview_name = (TextView)item_view.findViewById(R.id.preview_name);
-        //query(position, "", "");
 
-       // bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        final ParseFile file = objectsList.get(position).getParseFile("Preview");
+        file.getDataInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] data, com.parse.ParseException e) {
+                if (e == null) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    preview.setImageBitmap(bitmap);
 
-        preview.setImageBitmap(bitmaps.get(position)); //esto solo se asigna una vez
+                }
+
+
+            }
+        });
+
         preview_name.setText(objectsList.get(position).getString("Name")); //
 
         container.addView(item_view);

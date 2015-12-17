@@ -19,7 +19,7 @@ import java.util.List;
 public class SearchBoards extends AppCompatActivity {
     ViewPager viewPager;
     SwipeAdapter adapter;
-    List<Bitmap>bitmaps = new ArrayList<Bitmap>();
+    List<Bitmap>bitmaps = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,21 +30,9 @@ public class SearchBoards extends AppCompatActivity {
         ParseQuery<ParseObject> presetBoardQuery = ParseQuery.getQuery("Presets");
         presetBoardQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+            public void done(final List<ParseObject> objects, com.parse.ParseException e) {
                 if (e == null) {
-                    for (ParseObject obj : objects) {
-                        final ParseFile file = obj.getParseFile("Preview");
-                        file.getDataInBackground(new GetDataCallback() {
-                            @Override
-                            public void done(byte[] data, com.parse.ParseException e) {
-                                if (e == null) {
-                                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                    bitmaps.add(bitmap);
-                                }
-                            }
-                        });
-                    }
-                    adapter = new SwipeAdapter(ctx, objects, bitmaps);
+                    adapter = new SwipeAdapter(ctx, objects);
                     viewPager.setAdapter(adapter);
                 }
 
