@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
+import android.os.Parcelable;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -241,7 +242,6 @@ public class MainActivity extends AppCompatActivity{
                     Bitmap bmp = takeScreenShot();
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-
                     intent.putExtra("Preview", stream.toByteArray());
                     startActivity(intent);
                 } else
@@ -519,7 +519,7 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
-        
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.search) {
             Intent intent = new Intent(MainActivity.this, SearchBoards.class);

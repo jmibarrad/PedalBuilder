@@ -18,6 +18,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +28,7 @@ public class SwipeAdapter extends PagerAdapter{
     ParseFile Img;
     Bitmap bitmap;
     List<ParseObject> objectsList;
+    List<Bitmap>bitmaps;
     ImageView preview;
     TextView preview_name;
     View item_view;
@@ -34,14 +36,14 @@ public class SwipeAdapter extends PagerAdapter{
 
     private Context ctx;
     final ParseUser currentUser = ParseUser.getCurrentUser();
-    public SwipeAdapter(Context ctx, List<ParseObject> fromClass){
+    public SwipeAdapter(Context ctx, List<ParseObject> fromClass, List<Bitmap> bitmaps){
         this.ctx = ctx;
+        this.bitmaps = bitmaps;
         objectsList = fromClass;
     }
 
     @Override
     public int getCount() {
-
         return objectsList.size();
     }
 
@@ -60,7 +62,7 @@ public class SwipeAdapter extends PagerAdapter{
 
        // bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
-        preview.setImageBitmap(bitmap); //esto solo se asigna una vez
+        preview.setImageBitmap(bitmaps.get(position)); //esto solo se asigna una vez
         preview_name.setText(objectsList.get(position).getString("Name")); //
 
         container.addView(item_view);
