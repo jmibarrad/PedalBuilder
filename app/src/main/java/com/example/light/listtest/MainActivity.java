@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity{
         // Adding child data
         listDataHeader.add("Boards");
         listDataHeader.add("Pedals");
-        listDataHeader.add("Presets");
+        listDataHeader.add("My Presets");
         // listDataHeader.add("Power Supplies");
 
         // Adding child data
@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity{
         });
 
         final List<String> presetList = new ArrayList<>();
-        ParseQuery<ParseObject> presetQuery = ParseQuery.getQuery("Presets").whereEqualTo("User", ParseUser.getCurrentUser());
+        ParseQuery<ParseObject> presetQuery = ParseQuery.getQuery("Presets").whereEqualTo("User", ParseUser.getCurrentUser().getObjectId());
         presetQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, com.parse.ParseException e) {
