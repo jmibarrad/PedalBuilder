@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.GetDataCallback;
+import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -58,14 +59,25 @@ public class MainActivity extends AppCompatActivity{
 
         final ParseUser currentUser = ParseUser.getCurrentUser();
 
-        if(currentUser != null) {
-
-
-        } else {
+        if(ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
 
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
+
+        } else {
+
+            if(currentUser != null) {
+
+
+
+            } else {
+
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+
+            }
 
         }
 
@@ -523,6 +535,14 @@ public class MainActivity extends AppCompatActivity{
         //noinspection SimplifiableIfStatement
         if (id == R.id.search) {
             Intent intent = new Intent(MainActivity.this, SearchBoards.class);
+            startActivity(intent);
+            finish();
+            return true;
+        }
+
+        if (id == R.id.logout) {
+            ParseUser.logOut();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
             return true;
